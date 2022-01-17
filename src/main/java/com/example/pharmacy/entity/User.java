@@ -32,16 +32,18 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Bucket bucket;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(updatable = false, nullable = false)
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.createTime = LocalDateTime.now();
     }
 

@@ -23,8 +23,11 @@ public class Order {
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createTime;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.createTime = LocalDateTime.now();
     }
 

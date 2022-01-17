@@ -18,14 +18,14 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, length = 64, unique = true)
-    private String product_name;
+    @Column(name = "product_name", nullable = false, length = 64, unique = true)
+    private String productName;
 
-    @Column(length = 500)
-    private String product_description;
+    @Column(name = "product_description", length = 500)
+    private String productDescription;
 
     @Column(nullable = false)
-    private int price;
+    private Float price;
 
     @Column(length = 64)
     private String manifacturer;
@@ -38,14 +38,14 @@ public class Product {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "product_categories",
-    joinColumns = @JoinColumn(name = "product_id"),
-    inverseJoinColumns = @JoinColumn(name = "category_id"))
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories;
 
-    public Product(Long id, String product_name, String product_description, int price, String manifacturer, String composition, String indications) {
+    public Product(Long id, String productName, String productDescription, Float price, String manifacturer, String composition, String indications) {
         this.id = id;
-        this.product_name = product_name;
-        this.product_description = product_description;
+        this.productName = productName;
+        this.productDescription = productDescription;
         this.price = price;
         this.manifacturer = manifacturer;
         this.composition = composition;

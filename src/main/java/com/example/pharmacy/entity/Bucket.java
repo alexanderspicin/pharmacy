@@ -14,14 +14,13 @@ public class Bucket {
     @Column(nullable = false)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
     @ManyToMany
     @JoinTable(name = "buckets_product",
-    joinColumns = @JoinColumn(name = "bucket_id"),
-    inverseJoinColumns = @JoinColumn(name = "product_id"))
+            joinColumns = @JoinColumn(name = "bucket_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> products;
 
 }

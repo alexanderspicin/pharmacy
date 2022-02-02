@@ -1,16 +1,15 @@
 package com.example.pharmacy.controllers;
 
 
-import com.example.pharmacy.DTO.UserDTO;
+import com.example.pharmacy.payload.request.SignupRequest;
 import com.example.pharmacy.service.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Controller;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import javax.servlet.http.HttpServletRequest;
+
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -21,19 +20,32 @@ public class UserController {
     }
 
     @GetMapping("/new")
-    public String newUser(Model model) {
-        model.addAttribute("user", new UserDTO());
-        return "user";
+    public String auth(HttpServletRequest request) {
+        String log_in = request.getAuthType();;
+        return log_in;
     }
-
 
     @PostMapping("/new")
-    public String saveUser(UserDTO userDTO, Model model) {
-        if (userService.save(userDTO)) {
-            return "redirect:/";
-        } else {
-            model.addAttribute("user", userDTO);
-            return "user";
+    public String saveUser(@RequestBody SignupRequest signupRequest, Model model) {
+        try {
+            if (userService.save(signupRequest)) {
+                return "redirect:/";
+            } else {
+                model.addAttribute("user", signupRequest);
+                return "user";
+            }
+        } catch (DataIntegrityViolationException exception) {
+            System.out.println(exception.getMessage());
+            return "User with this username or email already exist";
+        } catch (RuntimeException e) {
+            return e.getMessage();
         }
+
     }
+
+    @RequestMapping("/login.html")
+    public String login() {
+        return "src/main/templates/login.html";
+    }
+
 }

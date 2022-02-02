@@ -1,6 +1,7 @@
 package com.example.pharmacy.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "products")
 public class Product {
 
@@ -42,13 +44,4 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories;
 
-    public Product(Long id, String productName, String productDescription, Float price, String manifacturer, String composition, String indications) {
-        this.id = id;
-        this.productName = productName;
-        this.productDescription = productDescription;
-        this.price = price;
-        this.manifacturer = manifacturer;
-        this.composition = composition;
-        this.indications = indications;
-    }
 }

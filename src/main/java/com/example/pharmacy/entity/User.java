@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Data
 @Entity
@@ -22,7 +24,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String username;
 
     @Column(nullable = false)
@@ -42,6 +44,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 
     @Column(updatable = false, nullable = false)
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")

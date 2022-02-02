@@ -1,6 +1,5 @@
 package com.example.pharmacy.config;
 
-import com.example.pharmacy.entity.Role;
 import com.example.pharmacy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +22,7 @@ import javax.persistence.Basic;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public SecurityConfig(@Lazy UserService userService) {
@@ -51,11 +50,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/users/new").hasAuthority(Role.ADMIN.name())
+                .antMatchers("/admin/**").authenticated()
+                .and()
+                .authorizeRequests()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                .loginPage("/src/main/templates/login.html")
                 .loginProcessingUrl("/auth")
                 .permitAll()
                 .and()

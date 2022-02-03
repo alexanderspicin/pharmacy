@@ -19,11 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/new")
-    public String auth(HttpServletRequest request) {
-        String log_in = request.getAuthType();;
-        return log_in;
-    }
 
     @PostMapping("/new")
     public String saveUser(@RequestBody SignupRequest signupRequest, Model model) {
@@ -41,11 +36,6 @@ public class UserController {
             return e.getMessage();
         }
 
-    }
-
-    @RequestMapping("/login.html")
-    public String login() {
-        return "src/main/templates/login.html";
     }
 
 }

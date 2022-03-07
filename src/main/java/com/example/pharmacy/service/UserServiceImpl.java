@@ -12,10 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,8 +36,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean save(SignupRequest signupRequest) throws DataIntegrityViolationException {
+        Pattern VALID_EMAIL_ADDRESS_REGEX =
+                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         if (!Objects.equals(signupRequest.getPassword(), signupRequest.getMatchingPassword())) {
-            throw new RuntimeException("Password not matching!!!");
+            throw new RuntimeException("Password not matching!");
+        }
+        if (userRepository.findUserByEmail(signupRequest.getEmail()) != null){
+            throw new RuntimeException("User with this email already exist");
+        }
+        if (!VALID_EMAIL_ADDRESS_REGEX.matcher(signupRequest.getEmail()).find()){
+            throw new RuntimeException("Incorrect email");
         }
         User user = User.builder()
                 .username(signupRequest.getUsername())
@@ -48,13 +60,46 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
     public UserDTO loadUserById(Long id) {
         User user = userRepository.findUserById(id);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with name: " + id);
+            throw new UsernameNotFoundException("User not found with id: " + id);
         }
         UserDTO userDTO = userToUserDTO(user);
         return userDTO;
+    }
+
+    private User getUserByPrincipal(Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.findUserByUsername(username);
+        if (user == null){
+            throw new UsernameNotFoundException("User not found with name: " + username);
+        }
+        return user;
+    }
+
+    @Override
+    public User getCurrentUser(Principal principal){
+        return getUserByPrincipal(principal);
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        User user = userRepository.findUserByUsername(username);
+        if (user == null){
+            throw new UsernameNotFoundException("User not found with name: " + username);
+        }
+        return user;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteUserById(id);
     }
 
     @Override
@@ -63,14 +108,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO loadUserByEmail(String email) {
+        return userToUserDTO(userRepository.findUserByEmail(email));
+    }
+
+    @Override
     public UserDTO userToUserDTO(User user) {
         return UserDTO.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .role(user.getRole().name())
-                .createTime(user.getCreateTime().toString()).build();
+                .lastname(user.getLastname()).build();
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(UserDTO userDTO) {
+        User savedUser = userRepository.findUserByUsername(userDTO.getUsername());
+        if (savedUser == null) {
+            throw new RuntimeException("User not found");
+        }
+        savedUser.setEmail(userDTO.getEmail());
+        savedUser.setFirstname(userDTO.getFirstname());
+        savedUser.setLastname(userDTO.getLastname());
+        savedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        userRepository.save(savedUser);
     }
 
     @Override
@@ -79,14 +142,14 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with name:" + username);
         }
+
         List<GrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority(user.getRole().name()));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                roles
-        );
+                roles);
     }
 
 }

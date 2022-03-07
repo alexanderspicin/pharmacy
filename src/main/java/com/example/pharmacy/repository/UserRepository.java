@@ -4,6 +4,7 @@ package com.example.pharmacy.repository;
 import com.example.pharmacy.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+
 import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -11,5 +12,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserById(Long id);
 
-    List<User> findAll();
-}
+    User findUserByEmail(String email);
+
+    void deleteUserById(Long id);
+
+    List<User> findAll();}

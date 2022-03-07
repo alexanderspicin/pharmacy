@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Сущность пользователь")
+@Schema(description = "Поля регистрации")
 public class SignupRequest {
 
     @JsonProperty("username")

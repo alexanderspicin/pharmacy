@@ -49,24 +49,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/admin/**").authenticated()
+        http.cors().and()
+        .authorizeRequests()
+                .antMatchers("/admin/**","/buckets/**").authenticated()
                 .and()
                 .authorizeRequests()
                 .anyRequest().permitAll()
                 .and()
-                .formLogin()
-                .loginPage("/src/main/templates/login.html")
-                .loginProcessingUrl("/auth")
+                .formLogin(form -> form.loginPage("/login").successForwardUrl("/home")).formLogin()
                 .permitAll()
                 .and()
                 .httpBasic()
                 .and()
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/").deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .and()
-                .csrf().disable();
+                .logoutSuccessUrl("/home").deleteCookies("JSESSIONID").permitAll()
+                .invalidateHttpSession(true);
+
+        http.csrf().disable();
 
 
     }

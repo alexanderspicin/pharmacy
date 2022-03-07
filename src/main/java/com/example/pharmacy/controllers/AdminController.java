@@ -1,35 +1,45 @@
 package com.example.pharmacy.controllers;
 
+import com.example.pharmacy.DTO.CategoryDTO;
 import com.example.pharmacy.DTO.ProductDTO;
 import com.example.pharmacy.DTO.UserDTO;
+
+import com.example.pharmacy.service.CategoryService;
 import com.example.pharmacy.service.ProductService;
 import com.example.pharmacy.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@RestController
+@RestController("/admin")
 @RequestMapping("/admin")
-@PreAuthorize("hasRole(ADMIN)")
+@PreAuthorize("hasRole('ADMIN')")
+@CrossOrigin
 public class AdminController {
     private final UserService userService;
 
     private final ProductService productService;
 
-    public AdminController(UserService userService, ProductService productService) {
+    private final CategoryService categoryService;
+
+    public AdminController(UserService userService, ProductService productService, CategoryService categoryService) {
         this.userService = userService;
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
-    @GetMapping("/deleteProduct/{id}")
+
+    @DeleteMapping("/deleteUser/{id}")
     @Transactional
-    public ResponseEntity<Boolean> deleteProduct(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Boolean> deleteUser(@PathVariable(name = "id") Long id) {
         try {
-            productService.deleteProduct(id);
+            userService.deleteUser(id);
             return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (Exception exception) {
             System.out.println(exception);
@@ -39,20 +49,11 @@ public class AdminController {
 
     @PostMapping("/createProduct")
     public ResponseEntity<String> saveProduct(@RequestBody ProductDTO productDTO) {
-        if (productService.save(productDTO)) {
-            return new ResponseEntity<>("Product successful saved", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Oops", HttpStatus.CONFLICT);
-        }
-    }
-
-    @GetMapping("/getUser/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable(name = "id") Long id) {
         try {
-            UserDTO userDTO = userService.loadUserById(id);
-            return new ResponseEntity<>(userDTO, HttpStatus.OK);
-        } catch (Exception exception) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            productService.save(productDTO);
+            return new ResponseEntity<>("Product successful saved", HttpStatus.OK);
+        }catch (RuntimeException exception){
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
@@ -60,5 +61,36 @@ public class AdminController {
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> usersDTO = userService.loadAll();
         return new ResponseEntity<>(usersDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/category/create")
+    public ResponseEntity<String> createCategory(@RequestBody CategoryDTO categoryDTO){
+        try {
+            categoryService.addCategory(categoryDTO);
+        }catch (RuntimeException exception){
+            return new ResponseEntity<>(exception.getMessage(),HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>("create category: " + categoryDTO.getTitle(), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/{productId}/uploadImage",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadImageToProduct(@PathVariable("productId") Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            productService.uploadImage(id, file);
+        }catch (RuntimeException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
+    @PutMapping("/updateProductCategories/{id}")
+    public ResponseEntity<String> updateCategory(@PathVariable("id") Long id, @RequestBody List<CategoryDTO> categoryDTOS){
+        try{
+            productService.updateProductCategory(id,categoryDTOS);
+            return new ResponseEntity<>("Category updated", HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        }
     }
 }

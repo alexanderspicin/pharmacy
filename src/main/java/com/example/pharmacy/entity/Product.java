@@ -27,7 +27,7 @@ public class Product {
     private String productDescription;
 
     @Column(nullable = false)
-    private Float price;
+    private Double price;
 
     @Column(length = 64)
     private String manifacturer;
@@ -38,7 +38,10 @@ public class Product {
     @Column(length = 500)
     private String indications;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @Column
+    private String imageLink; //S3 key!
+
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))

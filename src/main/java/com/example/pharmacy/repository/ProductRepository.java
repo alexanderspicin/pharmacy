@@ -1,5 +1,6 @@
 package com.example.pharmacy.repository;
 
+import com.example.pharmacy.entity.Category;
 import com.example.pharmacy.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,6 +10,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findProductById(Long id);
 
     void deleteProductById(Long id);
+
+    List<Product> findAllByCategories(Category category);
 
     List<Product> findAll();
 }

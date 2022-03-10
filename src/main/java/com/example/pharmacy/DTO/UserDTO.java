@@ -33,7 +33,7 @@ public class UserDTO {
     private String lastname;
 
     @JsonProperty("password")
-    @Schema(description = "Пароль", example = "password123")
+    @Schema(description = "Пароль", example = "password123", required = false)
     private String password;
 
     @JsonProperty("email")

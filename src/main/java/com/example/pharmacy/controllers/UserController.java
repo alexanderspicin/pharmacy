@@ -44,11 +44,16 @@ public class UserController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<String> editUser(Principal principal, UserDTO userDTO){
+    public ResponseEntity<String> editUser(Principal principal, @RequestBody UserDTO userDTO){
+        System.out.println(userDTO);
         if(principal == null || !Objects.equals(principal.getName(),userDTO.getUsername())){
             return new ResponseEntity<>("Not authorize",HttpStatus.UNAUTHORIZED);
         }
-        userService.updateProfile(userDTO);
+        try {
+            userService.updateProfile(userDTO);
+        }catch (RuntimeException exception){
+            return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity("Updated", HttpStatus.OK);
     }
 
@@ -68,7 +73,7 @@ public class UserController {
         try {
             UserDTO userDTO = userService.loadUserById(id);
             return new ResponseEntity<>(userDTO, HttpStatus.OK);
-        } catch (NullPointerException |UsernameNotFoundException usernameNotFoundException) {
+        } catch (NullPointerException |UsernameNotFoundException exception) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

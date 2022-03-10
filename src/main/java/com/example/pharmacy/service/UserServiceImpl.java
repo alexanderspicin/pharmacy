@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private final Pattern VALID_PASSWORD_REGEX = Pattern.compile("^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$", Pattern.CASE_INSENSITIVE);
+    private final Pattern VALID_USERNAME_REGEX = Pattern.compile("^[a-zA-Z0-9]([._-](?![._-])|[a-zA-Z0-9]){3,18}[a-zA-Z0-9]$");
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -36,8 +40,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean save(SignupRequest signupRequest) throws DataIntegrityViolationException {
-        Pattern VALID_EMAIL_ADDRESS_REGEX =
-                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        if (!VALID_USERNAME_REGEX.matcher(signupRequest.getUsername()).find()){
+            throw new RuntimeException("Incorrect username");
+        }
+
+        if (!VALID_PASSWORD_REGEX.matcher(signupRequest.getPassword()).find()){
+            throw new RuntimeException("Incorrect password");
+        }
+
         if (!Objects.equals(signupRequest.getPassword(), signupRequest.getMatchingPassword())) {
             throw new RuntimeException("Password not matching!");
         }
@@ -129,10 +139,23 @@ public class UserServiceImpl implements UserService {
         if (savedUser == null) {
             throw new RuntimeException("User not found");
         }
+
+        if (!VALID_EMAIL_ADDRESS_REGEX.matcher(userDTO.getEmail()).find()){
+            throw new RuntimeException("Incorrect email");
+        }
+
         savedUser.setEmail(userDTO.getEmail());
         savedUser.setFirstname(userDTO.getFirstname());
         savedUser.setLastname(userDTO.getLastname());
-        savedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        if (!(userDTO.getPassword().isEmpty())) {
+            if (!VALID_PASSWORD_REGEX.matcher(userDTO.getPassword()).find()){
+                throw new RuntimeException("Incorrect password");
+            }
+            savedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }else{
+            savedUser.setPassword(savedUser.getPassword());
+        }
+        System.out.println(savedUser.getPassword());
         userRepository.save(savedUser);
     }
 

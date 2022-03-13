@@ -44,7 +44,7 @@ public class ProductDTO {
 
     @JsonProperty("categories")
     @Schema(description = "Список категорий")
-    private List<Category> categories;
+    private List<CategoryDTO> categories;
 
     @JsonProperty("indications")
     @Schema(description = "Показания", example = "Гигиена полости рта - облегчает удаление налета")

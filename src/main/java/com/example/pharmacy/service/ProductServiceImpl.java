@@ -39,10 +39,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean save(ProductDTO productDTO) throws DataIntegrityViolationException {
-        List<Category> categories = productDTO.getCategories();
-        for (Category category : categories) {
-            if (categoryService.getCategoryByTitle(category.getTitle()) == null) {
-                throw new RuntimeException("Category with title: " + category.getTitle() + " not found");
+        List<CategoryDTO> categoriesDTO = productDTO.getCategories();
+        List<Category> categories = new ArrayList<>();
+        for (CategoryDTO categoryDTO : categoriesDTO) {
+            if (categoryService.getCategoryByTitle(categoryDTO.getTitle()) == null) {
+                throw new RuntimeException("Category with title: " + categoryDTO.getTitle() + " not found");
+            }else{
+                categories.add(categoryService.getCategoryByTitle(categoryDTO.getTitle()));
             }
         }
 
@@ -51,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
                 .productDescription(productDTO.getProductDescription())
                 .composition(productDTO.getComposition())
                 .indications(productDTO.getIndications())
-                .categories(productDTO.getCategories())
+                .categories(categories)
                 .price(productDTO.getPrice())
                 .manifacturer(productDTO.getManifacturer()).build();
         try {
@@ -81,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
                 product.getPrice(),
                 product.getManifacturer(),
                 product.getComposition(),
-                product.getCategories(),
+                getCollectCategoryDTOByCategory(product.getCategories()),
                 product.getIndications(),
                 product.getImageLink());
     }
@@ -155,6 +158,10 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll().stream().map(this::productToProductDTO).collect(Collectors.toList());
     }
 
+    private List<CategoryDTO> getCollectCategoryDTOByCategory(List<Category> categories) {
+        return categories.stream().map(categoryService::categoryToCategoryDTO).collect(Collectors.toList());
+    }
+
     @Override
     public ProductDTO productToProductDTO(Product product) {
         return ProductDTO.builder()
@@ -163,7 +170,7 @@ public class ProductServiceImpl implements ProductService {
                 .composition(product.getComposition())
                 .indications(product.getIndications())
                 .productDescription(product.getProductDescription())
-                .categories(product.getCategories())
+                .categories(getCollectCategoryDTOByCategory(product.getCategories()))
                 .manifacturer(product.getManifacturer())
                 .price(product.getPrice())
                 .imageLink(product.getImageLink())

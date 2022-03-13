@@ -42,7 +42,6 @@ public class AdminController {
             userService.deleteUser(id);
             return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (Exception exception) {
-            System.out.println(exception);
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
     }

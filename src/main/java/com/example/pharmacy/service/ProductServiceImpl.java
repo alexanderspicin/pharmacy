@@ -96,7 +96,6 @@ public class ProductServiceImpl implements ProductService {
         List<Category> newProductCategoriesList = categories == null ? new ArrayList<>() : new ArrayList<>(categories);
         for (CategoryDTO categoryDTO : categoryDTOS) {
             Category findCategory = categoryService.getCategoryByTitle(categoryDTO.getTitle());
-            System.out.println(findCategory);
             if (findCategory == null) {
                 throw new RuntimeException("Category with title: " + categoryDTO.getTitle() + " not found");
             } else if (newProductCategoriesList.contains(findCategory)) {
@@ -106,7 +105,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         product.setCategories(newProductCategoriesList);
-        System.out.println(product.getCategories());
         try {
             productRepository.save(product);
         } catch (DataIntegrityViolationException exception) {

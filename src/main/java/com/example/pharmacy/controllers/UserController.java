@@ -34,7 +34,6 @@ public class UserController {
             return new ResponseEntity("User created", HttpStatus.OK);
 
         } catch (DataIntegrityViolationException exception) {
-            System.out.println(exception.getMessage());
             return new ResponseEntity("User with this username already created", HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -45,7 +44,6 @@ public class UserController {
 
     @PutMapping("/update")
     public ResponseEntity<String> editUser(Principal principal, @RequestBody UserDTO userDTO){
-        System.out.println(userDTO);
         if(principal == null || !Objects.equals(principal.getName(),userDTO.getUsername())){
             return new ResponseEntity<>("Not authorize",HttpStatus.UNAUTHORIZED);
         }

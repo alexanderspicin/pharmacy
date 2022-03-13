@@ -155,7 +155,6 @@ public class UserServiceImpl implements UserService {
         }else{
             savedUser.setPassword(savedUser.getPassword());
         }
-        System.out.println(savedUser.getPassword());
         userRepository.save(savedUser);
     }
 

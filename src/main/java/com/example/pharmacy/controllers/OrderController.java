@@ -1,17 +1,14 @@
 package com.example.pharmacy.controllers;
 
 
-import com.example.pharmacy.DTO.BucketDTO;
+
 import com.example.pharmacy.DTO.OrderDTO;
 import com.example.pharmacy.entity.User;
 import com.example.pharmacy.service.OrderService;
 import com.example.pharmacy.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -50,6 +47,12 @@ public class OrderController {
             List<OrderDTO> orderDTOS = orderService.getOrdersByUser(principal.getName());
             return new ResponseEntity(orderDTOS, HttpStatus.OK);
         }
+    }
+
+    @GetMapping("/{id}")
+    public  ResponseEntity<OrderDTO> getOrder(@PathVariable("id") Long id){
+        OrderDTO orderDTO = orderService.getOrderBuId(id);
+        return new ResponseEntity<>(orderDTO, HttpStatus.OK);
     }
 
 }

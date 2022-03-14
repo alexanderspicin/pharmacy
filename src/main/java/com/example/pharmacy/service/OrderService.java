@@ -11,4 +11,6 @@ public interface OrderService {
 
     Boolean createOrder(User user);
     List<OrderDTO> getOrdersByUser(String username);
+
+    OrderDTO getOrderBuId(Long id);
 }

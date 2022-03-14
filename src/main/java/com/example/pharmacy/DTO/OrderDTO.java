@@ -20,6 +20,8 @@ import java.util.List;
 @Schema(description = "Сущность заказ")
 public class OrderDTO {
 
+    private Long id;
+
     private LocalDateTime createTime;
 
     private Status status;

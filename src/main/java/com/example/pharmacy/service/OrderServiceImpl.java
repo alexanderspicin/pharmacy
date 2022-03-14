@@ -9,6 +9,7 @@ import com.example.pharmacy.entity.*;
 import com.example.pharmacy.repository.BucketRepository;
 import com.example.pharmacy.repository.OrderRepository;
 import com.example.pharmacy.repository.UserRepository;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +71,35 @@ public class OrderServiceImpl implements OrderService{
             orderDTO.setCreateTime(order.getCreateTime());
             orderDTO.setOrderDetails(new ArrayList<>(mapByProductId.values()));
             orderDTO.aggregate();
+            orderDTO.setId(order.getId());
             orderDTOS.add(orderDTO);
         }
         return orderDTOS;
+    }
+
+    @Override
+    public OrderDTO getOrderBuId(Long id) {
+        Order order = orderRepository.findOrderById(id);
+        if (order == null){
+            throw new RuntimeException("Can't find order with id: " + id);
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        Map<Long, OrderDetailDTO> mapByProductId = new HashMap<>();
+        List<Product> products = orderRepository.findOrderById(id).getProducts();
+        for(Product product : products){
+            OrderDetailDTO detail = mapByProductId.get(product.getId());
+            if (detail == null){
+                mapByProductId.put(product.getId(), new OrderDetailDTO(product));
+            }else{
+                detail.setAmount(detail.getAmount() + 1);
+                detail.setSum(detail.getSum() + Double.valueOf(product.getPrice().toString()));
+            }
+        }
+        orderDTO.setId(order.getId());
+        orderDTO.setCreateTime(order.getCreateTime());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setOrderDetails(new ArrayList<>(mapByProductId.values()));
+        orderDTO.aggregate();
+        return orderDTO;
     }
 }

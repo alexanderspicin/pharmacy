@@ -66,6 +66,16 @@ public class UserController {
         }
     }
 
+    @GetMapping("/Role")
+    public ResponseEntity<String> getUserRole(Principal principal){
+        try {
+            User user = userService.getCurrentUser(principal);
+            return new ResponseEntity<>(user.getRole().toString(), HttpStatus.OK);
+        }catch (NullPointerException exception){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     @GetMapping("/getUserById/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable(name = "id") Long id) {
         try {

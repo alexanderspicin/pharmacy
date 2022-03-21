@@ -54,6 +54,12 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findUserByEmail(signupRequest.getEmail()) != null){
             throw new RuntimeException("User with this email already exist");
         }
+        if (signupRequest.getFirstname().isEmpty()){
+            throw new RuntimeException("First name is empty");
+        }
+        if (signupRequest.getLastname().isEmpty()){
+            throw new RuntimeException("Last name is empty");
+        }
         if (!VALID_EMAIL_ADDRESS_REGEX.matcher(signupRequest.getEmail()).find()){
             throw new RuntimeException("Incorrect email");
         }
@@ -129,7 +135,9 @@ public class UserServiceImpl implements UserService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .firstname(user.getFirstname())
-                .lastname(user.getLastname()).build();
+                .lastname(user.getLastname())
+                .role(user.getRole())
+                .build();
     }
 
     @Override
@@ -142,6 +150,13 @@ public class UserServiceImpl implements UserService {
 
         if (!VALID_EMAIL_ADDRESS_REGEX.matcher(userDTO.getEmail()).find()){
             throw new RuntimeException("Incorrect email");
+        }
+
+        if (userDTO.getFirstname().isEmpty()){
+            throw new RuntimeException("First name is empty");
+        }
+        if (userDTO.getLastname().isEmpty()){
+            throw new RuntimeException("Last name is empty");
         }
 
         savedUser.setEmail(userDTO.getEmail());

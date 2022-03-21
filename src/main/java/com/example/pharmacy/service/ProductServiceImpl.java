@@ -48,7 +48,24 @@ public class ProductServiceImpl implements ProductService {
                 categories.add(categoryService.getCategoryByTitle(categoryDTO.getTitle()));
             }
         }
-
+        if (productDTO.getProductName() == null){
+            throw new RuntimeException("Product name is empty");
+        }
+        if (productDTO.getProductDescription() == null){
+            throw new RuntimeException("Product description is empty");
+        }
+        if (productDTO.getComposition() == null){
+            throw new RuntimeException("Product composition is empty");
+        }
+        if (productDTO.getIndications()== null){
+            throw new RuntimeException("Product indications is empty");
+        }
+        if (productDTO.getManifacturer() == null){
+            throw new RuntimeException("Product manufacturer is empty");
+        }
+        if (productDTO.getPrice() == null){
+            throw new RuntimeException("Product price is empty");
+        }
         Product product = Product.builder()
                 .productName(productDTO.getProductName())
                 .productDescription(productDTO.getProductDescription())
@@ -60,7 +77,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             productRepository.save(product);
         } catch (DataIntegrityViolationException exception) {
-            throw new RuntimeException("Product with name: " + product.getProductName() + " already exist");
+            throw new RuntimeException("Can't save product");
         }
         return true;
     }
@@ -121,6 +138,22 @@ public class ProductServiceImpl implements ProductService {
         }
         Bucket bucket = user.getBucket();
         bucketService.deleteProduct(bucket, id);
+    }
+
+    @Override
+    public ProductDTO loadProductByName(String name) {
+        Product product = productRepository.findProductByProductName(name);
+        if (product == null) {
+            throw new RuntimeException("Product not found with name: " + name);
+        }
+        return new ProductDTO(product.getId(), product.getProductName(),
+                product.getProductDescription(),
+                product.getPrice(),
+                product.getManifacturer(),
+                product.getComposition(),
+                getCollectCategoryDTOByCategory(product.getCategories()),
+                product.getIndications(),
+                product.getImageLink());
     }
 
     @Override

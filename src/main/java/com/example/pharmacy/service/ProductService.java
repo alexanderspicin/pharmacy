@@ -21,6 +21,7 @@ public interface ProductService {
 
     void deleteProduct(Long id, String username);
 
+    ProductDTO loadProductByName(String name);
     void addToUserBucket(Long productId, String username);
     List<ProductDTO> loadAll();
     void deleteAllProductById(Long id, String username);

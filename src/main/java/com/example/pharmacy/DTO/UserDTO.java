@@ -1,6 +1,7 @@
 package com.example.pharmacy.DTO;
 
 
+import com.example.pharmacy.entity.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,10 @@ public class UserDTO {
     @JsonProperty("Id")
     @Schema(description = "Id", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
+
+    @JsonProperty("ROLE")
+    @Schema(description = "Роль юзера", example = "Ivanov", accessMode = Schema.AccessMode.READ_ONLY)
+    private Role role;
 
     @JsonProperty("username")
     @Schema(description = "Никнейм", example = "User123")

@@ -31,6 +31,16 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/get/{name}")
+    public ResponseEntity<ProductDTO> getProductByName(@PathVariable(name = "name") String name) {
+        try {
+            ProductDTO productDTO = productService.loadProductByName(name);
+            return new ResponseEntity<>(productDTO, HttpStatus.OK);
+        } catch (RuntimeException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/getAllProducts")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         List<ProductDTO> productsDTO = productService.loadAll();
@@ -49,4 +59,5 @@ public class ProductController {
         List<ProductDTO> productDTOS = productService.loadProductsByCategory(categoryDTO);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
     }
+
 }

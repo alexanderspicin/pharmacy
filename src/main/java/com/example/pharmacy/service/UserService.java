@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface UserService extends UserDetailsService {
     boolean save(SignupRequest signupRequest);
+
     void save(User user);
 
     UserDTO loadUserById(Long id);
@@ -27,5 +28,7 @@ public interface UserService extends UserDetailsService {
     User getCurrentUser(Principal principal);
 
     User findUserByUsername(String username);
+
     void deleteUser(Long id);
+
 }

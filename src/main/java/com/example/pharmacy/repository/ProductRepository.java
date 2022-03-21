@@ -10,7 +10,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findProductById(Long id);
 
     void deleteProductById(Long id);
-
+    Product findProductByProductName(String productName);
     List<Product> findAllByCategories(Category category);
 
     List<Product> findAll();

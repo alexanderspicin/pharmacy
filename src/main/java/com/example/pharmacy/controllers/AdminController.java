@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 
 @RestController("/admin")
@@ -37,12 +39,12 @@ public class AdminController {
 
     @DeleteMapping("/deleteUser/{id}")
     @Transactional
-    public ResponseEntity<Boolean> deleteUser(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable(name = "id") Long id) {
         try {
             userService.deleteUser(id);
-            return new ResponseEntity<>(true, HttpStatus.OK);
+            return new ResponseEntity<>("User deleted", HttpStatus.OK);
         } catch (Exception exception) {
-            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("User with id: " + id + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -78,7 +80,7 @@ public class AdminController {
         try {
             productService.uploadImage(id, file);
         }catch (RuntimeException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }

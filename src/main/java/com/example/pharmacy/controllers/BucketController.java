@@ -28,7 +28,7 @@ public class BucketController {
     @GetMapping("/myBucket")
     public ResponseEntity<BucketDTO> aboutBucket(Principal principal){
         if (principal == null){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity(new BucketDTO(),HttpStatus.UNAUTHORIZED);
         } else{
             BucketDTO bucketDTO = bucketService.getBucketByUser(principal.getName());
             return new ResponseEntity(bucketDTO, HttpStatus.OK);

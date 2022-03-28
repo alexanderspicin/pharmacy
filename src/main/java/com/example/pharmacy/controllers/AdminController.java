@@ -1,10 +1,12 @@
 package com.example.pharmacy.controllers;
 
 import com.example.pharmacy.DTO.CategoryDTO;
+import com.example.pharmacy.DTO.OrderDTO;
 import com.example.pharmacy.DTO.ProductDTO;
 import com.example.pharmacy.DTO.UserDTO;
 
 import com.example.pharmacy.service.CategoryService;
+import com.example.pharmacy.service.OrderService;
 import com.example.pharmacy.service.ProductService;
 import com.example.pharmacy.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -15,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 
 @RestController("/admin")
@@ -30,10 +30,13 @@ public class AdminController {
 
     private final CategoryService categoryService;
 
-    public AdminController(UserService userService, ProductService productService, CategoryService categoryService) {
+    private final OrderService orderService;
+
+    public AdminController(UserService userService, ProductService productService, CategoryService categoryService, OrderService orderService) {
         this.userService = userService;
         this.productService = productService;
         this.categoryService = categoryService;
+        this.orderService = orderService;
     }
 
 
@@ -85,6 +88,13 @@ public class AdminController {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<List<OrderDTO>> myOrders(@PathVariable("id") Long id){
+        List<OrderDTO> orderDTOS = orderService.getOrdersByUserId(id);
+        return new ResponseEntity(orderDTOS, HttpStatus.OK);
+        }
+
+
     @PutMapping("/updateProductCategories/{id}")
     public ResponseEntity<String> updateCategory(@PathVariable("id") Long id, @RequestBody List<CategoryDTO> categoryDTOS){
         try{
@@ -92,6 +102,16 @@ public class AdminController {
             return new ResponseEntity<>("Category updated", HttpStatus.OK);
         }catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/changeOrderStatus/{id}/{orderStatus}")
+    public ResponseEntity updateOrderStatus(@PathVariable(name = "id") Long id, @PathVariable(name = "orderStatus") String orderStatus){
+        try{
+            orderService.changeOrderStatus(id, orderStatus);
+            return new ResponseEntity("order status changed",HttpStatus.OK);
+        }catch (RuntimeException exception){
+            return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -40,7 +40,7 @@ public class OrderController {
     }
 
     @GetMapping("/myOrders")
-    public ResponseEntity<List<OrderDTO>> aboutBucket(Principal principal){
+    public ResponseEntity<List<OrderDTO>> myOrders(Principal principal){
         if (principal == null){
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else{

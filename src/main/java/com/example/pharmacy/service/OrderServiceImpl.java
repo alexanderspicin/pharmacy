@@ -1,22 +1,16 @@
 package com.example.pharmacy.service;
 
-
-import com.example.pharmacy.DTO.BucketDTO;
-import com.example.pharmacy.DTO.BucketDetailDTO;
 import com.example.pharmacy.DTO.OrderDTO;
 import com.example.pharmacy.DTO.OrderDetailDTO;
 import com.example.pharmacy.entity.*;
 import com.example.pharmacy.repository.BucketRepository;
 import com.example.pharmacy.repository.OrderRepository;
 import com.example.pharmacy.repository.UserRepository;
-import org.aspectj.weaver.ast.Or;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
@@ -29,6 +23,20 @@ public class OrderServiceImpl implements OrderService{
         this.orderRepository = orderRepository;
         this.bucketRepository = bucketRepository;
         this.userRepository = userRepository;
+    }
+
+    @Override
+    public void changeOrderStatus(Long orderId, String status) {
+        try{
+            Status.valueOf(status);
+        }catch (IllegalArgumentException e){
+            System.out.println(e.getMessage());
+            /* LOG IT*/
+            throw new RuntimeException("Status with name: "+ status + " not found");
+        }
+        Order order = orderRepository.findOrderById(orderId);
+        order.setStatus(Status.valueOf(status));
+        orderRepository.save(order);
     }
 
     @Override
@@ -54,6 +62,10 @@ public class OrderServiceImpl implements OrderService{
         if (user == null || orderRepository.findAllByUser(user).isEmpty()) {
             return orderDTOS;
         }
+        return getOrderDTOS(orderDTOS, user);
+    }
+
+    private List<OrderDTO> getOrderDTOS(List<OrderDTO> orderDTOS, User user) {
         for (Order order : orderRepository.findAllByUser(user)) {
             OrderDTO orderDTO = new OrderDTO();
             Map<Long, OrderDetailDTO> mapByProductId = new HashMap<>();
@@ -75,6 +87,17 @@ public class OrderServiceImpl implements OrderService{
             orderDTOS.add(orderDTO);
         }
         return orderDTOS;
+    }
+
+    @Override
+    public List<OrderDTO> getOrdersByUserId(Long id) {
+
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        User user = userRepository.findUserById(id);
+        if (user == null || orderRepository.findAllByUserId(id).isEmpty()) {
+            return orderDTOS;
+        }
+        return getOrderDTOS(orderDTOS, user);
     }
 
     @Override

@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private final Pattern VALID_PASSWORD_REGEX = Pattern.compile("^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$", Pattern.CASE_INSENSITIVE);
     private final Pattern VALID_USERNAME_REGEX = Pattern.compile("^[a-zA-Z0-9]([._-](?![._-])|[a-zA-Z0-9]){3,18}[a-zA-Z0-9]$");
+
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder, EmailSender emailSender) {
         this.userRepository = userRepository;
@@ -41,27 +42,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean save(SignupRequest signupRequest) throws DataIntegrityViolationException {
-        if (!VALID_USERNAME_REGEX.matcher(signupRequest.getUsername()).find()){
+        if (signupRequest.getUsername() == null || !VALID_USERNAME_REGEX.matcher(signupRequest.getUsername()).find()) {
             throw new RuntimeException("Incorrect username");
         }
 
-        if (!VALID_PASSWORD_REGEX.matcher(signupRequest.getPassword()).find()){
+        if (signupRequest.getPassword() == null || !VALID_PASSWORD_REGEX.matcher(signupRequest.getPassword()).find()) {
             throw new RuntimeException("Incorrect password");
         }
 
-        if (!Objects.equals(signupRequest.getPassword(), signupRequest.getMatchingPassword())) {
+        if (signupRequest.getPassword() == null || !Objects.equals(signupRequest.getPassword(), signupRequest.getMatchingPassword())) {
             throw new RuntimeException("Password not matching!");
         }
-        if (userRepository.findUserByEmail(signupRequest.getEmail()) != null){
+        if (userRepository.findUserByEmail(signupRequest.getEmail()) != null) {
             throw new RuntimeException("User with this email already exist");
         }
-        if (signupRequest.getFirstname().isEmpty()){
+        if (signupRequest.getFirstname() == null || signupRequest.getFirstname().isEmpty()) {
             throw new RuntimeException("First name is empty");
         }
-        if (signupRequest.getLastname().isEmpty()){
+        if (signupRequest.getLastname() == null || signupRequest.getLastname().isEmpty()) {
             throw new RuntimeException("Last name is empty");
         }
-        if (!VALID_EMAIL_ADDRESS_REGEX.matcher(signupRequest.getEmail()).find()){
+        if (signupRequest.getEmail() == null || !VALID_EMAIL_ADDRESS_REGEX.matcher(signupRequest.getEmail()).find()) {
             throw new RuntimeException("Incorrect email");
         }
         User user = User.builder()
@@ -95,21 +96,21 @@ public class UserServiceImpl implements UserService {
     private User getUserByPrincipal(Principal principal) {
         String username = principal.getName();
         User user = userRepository.findUserByUsername(username);
-        if (user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("User not found with name: " + username);
         }
         return user;
     }
 
     @Override
-    public User getCurrentUser(Principal principal){
+    public User getCurrentUser(Principal principal) {
         return getUserByPrincipal(principal);
     }
 
     @Override
     public User findUserByUsername(String username) {
         User user = userRepository.findUserByUsername(username);
-        if (user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("User not found with name: " + username);
         }
         return user;
@@ -150,26 +151,27 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
 
-        if (!VALID_EMAIL_ADDRESS_REGEX.matcher(userDTO.getEmail()).find()){
+        if (userDTO.getEmail() == null || !VALID_EMAIL_ADDRESS_REGEX.matcher(userDTO.getEmail()).find()) {
             throw new RuntimeException("Incorrect email");
         }
 
-        if (userDTO.getFirstname().isEmpty()){
+        if (userDTO.getFirstname() == null || userDTO.getFirstname().isEmpty()) {
             throw new RuntimeException("First name is empty");
         }
-        if (userDTO.getLastname().isEmpty()){
+        if (userDTO.getLastname() == null || userDTO.getLastname().isEmpty()) {
             throw new RuntimeException("Last name is empty");
         }
 
         savedUser.setEmail(userDTO.getEmail());
         savedUser.setFirstname(userDTO.getFirstname());
         savedUser.setLastname(userDTO.getLastname());
-        if (!(userDTO.getPassword().isEmpty())) {
-            if (!VALID_PASSWORD_REGEX.matcher(userDTO.getPassword()).find()){
+        if (!(userDTO.getPassword() == null)) {
+            if (userDTO.getLastname().isEmpty()) {
+                savedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            }else if (!VALID_PASSWORD_REGEX.matcher(userDTO.getPassword()).find()) {
                 throw new RuntimeException("Incorrect password");
             }
-            savedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }else{
+        } else {
             savedUser.setPassword(savedUser.getPassword());
         }
         userRepository.save(savedUser);

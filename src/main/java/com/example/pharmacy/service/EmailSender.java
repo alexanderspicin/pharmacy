@@ -1,5 +1,7 @@
 package com.example.pharmacy.service;
 
+import com.example.pharmacy.entity.Order;
+
 import javax.mail.MessagingException;
 
 public interface EmailSender {
@@ -9,4 +11,6 @@ public interface EmailSender {
     void sendMimeEmail(String toAddress, String subject, String message) throws MessagingException;
 
     void sendWelcomeEmail(String email, String username) throws MessagingException;
+
+    void sendTrackEmail(Order order) throws MessagingException;
 }

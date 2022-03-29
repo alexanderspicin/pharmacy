@@ -5,10 +5,7 @@ import com.example.pharmacy.DTO.OrderDTO;
 import com.example.pharmacy.DTO.ProductDTO;
 import com.example.pharmacy.DTO.UserDTO;
 
-import com.example.pharmacy.service.CategoryService;
-import com.example.pharmacy.service.OrderService;
-import com.example.pharmacy.service.ProductService;
-import com.example.pharmacy.service.UserService;
+import com.example.pharmacy.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +29,14 @@ public class AdminController {
 
     private final OrderService orderService;
 
-    public AdminController(UserService userService, ProductService productService, CategoryService categoryService, OrderService orderService) {
+    private final EmailSender emailSender;
+
+    public AdminController(UserService userService, ProductService productService, CategoryService categoryService, OrderService orderService, EmailSender emailSender) {
         this.userService = userService;
         this.productService = productService;
         this.categoryService = categoryService;
         this.orderService = orderService;
+        this.emailSender = emailSender;
     }
 
 

@@ -10,6 +10,7 @@ import com.example.pharmacy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import java.util.*;
 
 
@@ -18,11 +19,13 @@ public class OrderServiceImpl implements OrderService{
     private final OrderRepository orderRepository;
     private final BucketRepository bucketRepository;
     private final UserRepository userRepository;
+    private final EmailSender emailSender;
 
-    public OrderServiceImpl(OrderRepository orderRepository, BucketRepository bucketRepository, UserRepository userRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, BucketRepository bucketRepository, UserRepository userRepository, EmailSender emailSender) {
         this.orderRepository = orderRepository;
         this.bucketRepository = bucketRepository;
         this.userRepository = userRepository;
+        this.emailSender = emailSender;
     }
 
     @Override
@@ -37,6 +40,11 @@ public class OrderServiceImpl implements OrderService{
         Order order = orderRepository.findOrderById(orderId);
         order.setStatus(Status.valueOf(status));
         orderRepository.save(order);
+        try {
+            emailSender.sendTrackEmail(order);
+        } catch (MessagingException e) {
+            /* LOG IT*/
+        }
     }
 
     @Override

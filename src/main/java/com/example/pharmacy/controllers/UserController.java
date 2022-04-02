@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.Objects;
 
@@ -24,6 +26,7 @@ import java.util.Objects;
 public class UserController {
     private final UserService userService;
     private final EmailSender emailSender;
+
     public UserController(UserService userService, EmailSender emailSender) {
         this.userService = userService;
         this.emailSender = emailSender;
@@ -34,7 +37,7 @@ public class UserController {
     public ResponseEntity<String> saveUser(@RequestBody SignupRequest signupRequest) {
         try {
             userService.save(signupRequest);
-            emailSender.sendWelcomeEmail(signupRequest.getEmail(),signupRequest.getUsername());
+            emailSender.sendWelcomeEmail(signupRequest.getEmail(), signupRequest.getUsername());
             return new ResponseEntity("User created", HttpStatus.OK);
         } catch (DataIntegrityViolationException exception) {
             return new ResponseEntity("User with this username already created", HttpStatus.BAD_REQUEST);
@@ -46,6 +49,15 @@ public class UserController {
         }
     }
 
+
+    @GetMapping(value = "/logout")
+    public ResponseEntity logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
 
     @PutMapping("/update")
     public ResponseEntity<String> editUser(Principal principal, @RequestBody UserDTO userDTO) {

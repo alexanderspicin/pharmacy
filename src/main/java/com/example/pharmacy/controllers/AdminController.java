@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController("/admin")
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAuthority('ADMIN')")
 @CrossOrigin
 public class AdminController {
     private final UserService userService;
@@ -31,12 +32,15 @@ public class AdminController {
 
     private final EmailSender emailSender;
 
-    public AdminController(UserService userService, ProductService productService, CategoryService categoryService, OrderService orderService, EmailSender emailSender) {
+    private final SessionRegistry sessionRegistry;
+
+    public AdminController(UserService userService, ProductService productService, CategoryService categoryService, OrderService orderService, EmailSender emailSender, SessionRegistry sessionRegistry) {
         this.userService = userService;
         this.productService = productService;
         this.categoryService = categoryService;
         this.orderService = orderService;
         this.emailSender = emailSender;
+        this.sessionRegistry = sessionRegistry;
     }
 
 
@@ -113,5 +117,12 @@ public class AdminController {
         }catch (RuntimeException exception){
             return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/info/usersOnline")
+    public ResponseEntity getUsersOnline(){
+        List<Object> principals = sessionRegistry.getAllPrincipals();
+        System.out.println(principals);
+        return new ResponseEntity(principals.size() + " users online",HttpStatus.OK);
     }
 }

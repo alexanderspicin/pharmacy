@@ -32,6 +32,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        System.out.println(request.getParameter("username"));
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getParameter("username"),request.getParameter("password"));
         return authenticationManager.authenticate(authenticationToken);
     }
@@ -47,7 +48,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 .sign(algorithm);
         String refreshToken = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ 10 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis()+ 20 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
         /*response.setHeader("accessToken", accessToken);

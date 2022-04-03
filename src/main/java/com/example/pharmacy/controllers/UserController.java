@@ -1,6 +1,7 @@
 package com.example.pharmacy.controllers;
 
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -71,10 +72,13 @@ public class UserController {
 
     @GetMapping("/refresh/token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println(request);
+        System.out.println(response);
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refreshToken = authorizationHeader.substring("Bearer ".length());
+                System.out.println(refreshToken);
                 Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(refreshToken);
@@ -94,6 +98,7 @@ public class UserController {
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(),tokens);
             } catch (Exception exception) {
+                System.out.println(exception.getMessage());
                 response.setHeader("error", exception.getMessage());
                 response.setStatus(FORBIDDEN.value());
                 Map<String,String> error = new HashMap<>();

@@ -2,7 +2,6 @@ package com.example.pharmacy.service;
 
 import com.example.pharmacy.DTO.CategoryDTO;
 import com.example.pharmacy.DTO.ProductDTO;
-import com.example.pharmacy.entity.Category;
 import com.example.pharmacy.entity.Product;
 import org.springframework.web.multipart.MultipartFile;
 

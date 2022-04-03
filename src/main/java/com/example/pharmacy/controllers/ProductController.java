@@ -4,10 +4,8 @@ import com.example.pharmacy.DTO.CategoryDTO;
 import com.example.pharmacy.DTO.ProductDTO;
 import com.example.pharmacy.service.ProductService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.List;
 

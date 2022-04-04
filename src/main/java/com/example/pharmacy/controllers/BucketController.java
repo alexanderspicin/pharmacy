@@ -63,4 +63,24 @@ public class BucketController {
         }
         return new ResponseEntity<>("Product deleted from yours bucket",HttpStatus.OK);
     }
+
+    @GetMapping("/setPromocode/{promocode}")
+    public ResponseEntity<String> addPromocode(@PathVariable(name = "promocode") String promocode, Principal principal){
+        try {
+            bucketService.addCoupon(promocode,principal.getName());
+            return new ResponseEntity<>("Promocode added",HttpStatus.OK);
+        }catch (RuntimeException exception){
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/remove/promocode")
+    public ResponseEntity<String> removePromocode(Principal principal){
+        try {
+            bucketService.removeCoupon(principal.getName());
+            return new ResponseEntity<>("Promocode removed",HttpStatus.OK);
+        }catch (RuntimeException exception){
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }

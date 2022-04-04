@@ -1,6 +1,7 @@
 package com.example.pharmacy.service;
 
 import com.example.pharmacy.DTO.UserDTO;
+import com.example.pharmacy.entity.Promocode;
 import com.example.pharmacy.entity.Role;
 import com.example.pharmacy.entity.User;
 import com.example.pharmacy.payload.request.SignupRequest;
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService {
                 .email(signupRequest.getEmail())
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .role(Role.ClIENT)
+                .promocodes(List.of(Promocode.NEW150))
                 .build();
         userRepository.save(user);
 

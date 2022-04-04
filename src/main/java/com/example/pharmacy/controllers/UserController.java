@@ -28,6 +28,7 @@ import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -70,15 +71,12 @@ public class UserController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping("/refresh/token")
+    @PostMapping("/refresh/token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        System.out.println(request);
-        System.out.println(response);
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refreshToken = authorizationHeader.substring("Bearer ".length());
-                System.out.println(refreshToken);
                 Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(refreshToken);
@@ -100,7 +98,7 @@ public class UserController {
             } catch (Exception exception) {
                 System.out.println(exception.getMessage());
                 response.setHeader("error", exception.getMessage());
-                response.setStatus(FORBIDDEN.value());
+                response.setStatus(UNAUTHORIZED.value());
                 Map<String,String> error = new HashMap<>();
                 error.put("errorMessage", exception.getMessage());
                 response.setContentType(APPLICATION_JSON_VALUE);

@@ -17,6 +17,8 @@ public class Bucket {
     @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
+    private Promocode promocode;
+
     @ManyToMany
     @JoinTable(name = "buckets_product",
             joinColumns = @JoinColumn(name = "bucket_id"),

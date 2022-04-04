@@ -14,6 +14,8 @@ public interface BucketService {
 
     BucketDTO getBucketByUser(String username);
 
+    void addCoupon(String promocode,String username);
+    void removeCoupon(String username);
     void deleteProduct(Bucket bucket, Long productId);
 
     void deleteAllProductById(Bucket bucket, Long productId);
